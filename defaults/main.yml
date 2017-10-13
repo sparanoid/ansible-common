@@ -23,7 +23,7 @@ common_packages:
   - bash-completion
   - htop
   - tmux
-yum_update_exclude_packages: kernel*,shadowsocks*
+yum_update_exclude_packages: kernel*
 sysctl_params:
   - { "key": "fs.file-max", "value": "51200" }
   - { "key": "net.core.rmem_max", "value": "67108864" }
