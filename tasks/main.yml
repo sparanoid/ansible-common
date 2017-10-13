@@ -1,0 +1,203 @@
+#
+# basic setup
+#
+- name: make sure authorized_key exists
+  authorized_key: user=root
+                  key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  tags:
+    - basic
+    - ssh
+    - debug
+
+- name: check authorized_keys permission
+  file: path=~/.ssh/authorized_keys
+        mode=0600
+  tags:
+    - basic
+    - ssh
+    - debug
+
+- name: update server hostname
+  hostname: name={{ inventory_hostname }}
+  tags:
+    - basic
+    - ssh
+    - hostname
+
+- name: enable PermitRootLogin
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PermitRootLogin "
+              insertafter="^#PermitRootLogin "
+              line="PermitRootLogin yes"
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_root_login
+
+- name: disable PasswordAuthentication for password logins
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PasswordAuthentication "
+              insertafter="^#PasswordAuthentication "
+              line="PasswordAuthentication no"
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: change SSH port to {{ ssh_port }}
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^Port "
+              insertafter="^#Port "
+              line="Port {{ ssh_port }}"
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: update .bashrc for root and skeleton
+  template: src=.bashrc
+            dest={{ item }}/.bashrc
+            owner=root
+            group=root
+            mode=0644
+  with_items:
+    - /root
+    - /etc/skel
+  tags:
+    - basic
+    - bash
+    - bashrc
+
+- name: update .bashrc for current user
+  template: src=.bashrc
+            dest={{ ansible_env['HOME'] }}/.bashrc
+            owner={{ ansible_user_id }}
+            group={{ ansible_user_id }}
+            mode=0644
+  tags:
+    - basic
+    - bash
+    - bashrc
+
+- name: update .tmux.conf for root and skeleton
+  template: src=.tmux.conf
+            dest={{ item }}/.tmux.conf
+            owner=root
+            group=root
+            mode=0644
+  with_items:
+    - /root
+    - /etc/skel
+  tags:
+    - basic
+    - bash
+    - tmux
+
+- name: update .tmux.conf for current user
+  template: src=.tmux.conf
+            dest={{ ansible_env['HOME'] }}/.tmux.conf
+            owner={{ ansible_user_id }}
+            group={{ ansible_user_id }}
+            mode=0644
+  tags:
+    - basic
+    - bash
+    - tmux
+
+- name: get distribution version
+  debug: msg={{ ansible_distribution_version }}
+  tags: debug
+
+- name: get architecture
+  debug: msg={{ ansible_architecture }}
+  tags: debug
+
+- name: install essential repos (7, x86_64)
+  yum:
+    name: "{{ item }}"
+    state: present
+    validate_certs: no
+  with_items: "{{ repos }}"
+  when: ansible_distribution_version >= '7'
+  tags:
+    - basic
+    - repo
+
+- name: install essential repos (6, x86_64)
+  yum:
+    name: "{{ item }}"
+    state: present
+    validate_certs: no
+  with_items: "{{ repos_6_x86_64 }}"
+  when: ansible_distribution_version < '7' and ansible_architecture == 'x86_64'
+  tags:
+    - basic
+    - repo
+
+- name: install essential repos (6, i386)
+  yum:
+    name: "{{ item }}"
+    state: present
+    validate_certs: no
+  with_items: "{{ repos_6_i386 }}"
+  when: ansible_distribution_version < '7' and ansible_architecture != 'x86_64'
+  tags:
+    - basic
+    - repo
+
+- name: do yum update
+  yum:
+    name: '*'
+    state: latest
+    exclude: "{{ yum_update_exclude_packages }}"
+  tags:
+    - basic
+    - update
+
+- name: install essential packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ common_packages }}"
+  notify: update updatedb
+  tags:
+    - basic
+    - repo
+
+- name: tweak sysctl
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items: "{{ sysctl_params }}"
+  # Allow erros for OpenVZ serviers
+  ignore_errors: yes
+  tags:
+    - sysctl
+
+#
+# setup mail
+#
+
+# disable postfix for security
+- name: disable postfix
+  service: name=postfix state=stopped enabled=no
+  tags:
+    - mail
+
+- name: set postfix parameters
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^{{ item.param }}"
+    insertafter: "^#{{ item.param }}"
+    line: "{{ item.param }} = {{ item.value }}"
+  with_items:
+    - { param: 'inet_interfaces', value: 'localhost' }
+    - { param: 'process_control_timeout', value: '5' }
+  tags:
+    - mail
