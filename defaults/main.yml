@@ -5,17 +5,14 @@ repos:
   - epel-release
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/7/x86_64/ius-release-1.0-15.ius.el7.noarch.rpm"
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/7/x86_64/yum-plugin-replace-0.2.7-1.ius.el7.noarch.rpm"
-  - "https://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm"
 repos_6_x86_64:
   - epel-release
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/6/x86_64/ius-release-1.0-14.ius.el6.noarch.rpm"
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/6/x86_64/yum-plugin-replace-0.2.7-1.ius.el6.noarch.rpm"
-  - "https://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm"
 repos_6_i386:
   - epel-release
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/6/i386/ius-release-1.0-14.ius.el6.noarch.rpm"
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/6/i386/yum-plugin-replace-0.2.7-1.ius.el6.noarch.rpm"
-  - "https://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm"
 common_packages:
   - vim
   - mlocate
