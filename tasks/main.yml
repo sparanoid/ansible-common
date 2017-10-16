@@ -115,7 +115,7 @@
   debug: msg={{ ansible_architecture }}
   tags: debug
 
-- name: install essential repos (7, x86_64)
+- name: install essential repos (7, noarch)
   yum:
     name: "{{ item }}"
     state: present
