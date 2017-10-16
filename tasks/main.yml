@@ -186,7 +186,11 @@
 
 # disable postfix for security
 - name: disable postfix
-  service: name=postfix state=stopped enabled=no
+  service:
+    name: postfix
+    state: stopped
+    enabled: no
+  ignore_errors: yes
   tags:
     - mail
 
