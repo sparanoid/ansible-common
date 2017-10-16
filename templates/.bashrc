@@ -79,6 +79,7 @@ alias l='ls $LS_OPTIONS -GFalh'
 alias ls='ls $LS_OPTIONS -G'
 alias la='ls $LS_OPTIONS -GFa'
 
+alias ap='ansible-playbook'
 alias rl='. ~/.bashrc'
 alias reload='. ~/.bashrc'
 alias profile='vi ~/.bashrc'
