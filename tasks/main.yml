@@ -185,12 +185,18 @@
 #
 
 # disable postfix for security
+- name: check if postfix is installed
+  yum:
+    list: postfix
+  register: yum_list_result
+
 - name: disable postfix
   service:
     name: postfix
     state: stopped
     enabled: no
   ignore_errors: yes
+  when: yum_list_result|selectattr("yumstate", "match", "installed")|list|length != 0
   tags:
     - mail
 
@@ -203,5 +209,6 @@
   with_items:
     - { param: 'inet_interfaces', value: 'localhost' }
     - { param: 'process_control_timeout', value: '5' }
+  when: yum_list_result|selectattr("yumstate", "match", "installed")|list|length != 0
   tags:
     - mail
