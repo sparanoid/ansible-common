@@ -8,8 +8,10 @@
   tags: debug
 
 - name: make sure authorized_key exists
-  authorized_key: user=root
-                  key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
   tags:
     - basic
     - ssh
