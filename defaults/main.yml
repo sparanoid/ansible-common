@@ -20,6 +20,7 @@ common_packages:
   - bash-completion
   - htop
   - tmux
+  - rsync
 yum_update_exclude_packages: kernel*
 sysctl_params:
   - { "key": "fs.file-max", "value": "51200" }
