@@ -189,16 +189,42 @@
     - sysctl
 
 #
+# setup selinux
+#
+
+- name: install dependencies for selinux ansible module
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - libselinux-python
+    - libsemanage-python
+  tags:
+    - selinux
+
+- name: disable selinux temporarily (in permissive mode)
+  command: setenforce 0
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - selinux
+
+- name: disable selinux permanently (at next reboot)
+  selinux:
+    state: disabled
+  tags:
+    - selinux
+
+#
 # setup mail
 #
 
-# disable postfix for security
 - name: check if postfix is installed
   yum:
     list: postfix
   register: postfix_yum_list
 
-- name: disable postfix
+- name: disable postfix for security
   service:
     name: postfix
     state: stopped
