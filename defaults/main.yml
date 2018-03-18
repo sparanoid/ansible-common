@@ -2,7 +2,7 @@
 deploy_user: deploy
 ssh_port: 22
 repos:
-  - epel-release
+  - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/7/x86_64/ius-release-1.0-15.ius.el7.noarch.rpm"
   - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/7/x86_64/yum-plugin-replace-0.2.7-1.ius.el7.noarch.rpm"
 repos_6_x86_64:
