@@ -33,10 +33,11 @@
     - hostname
 
 - name: enable PermitRootLogin
-  lineinfile: dest=/etc/ssh/sshd_config
-              regexp="^PermitRootLogin "
-              insertafter="^#PermitRootLogin "
-              line="PermitRootLogin yes"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin '
+    insertafter: '^#PermitRootLogin '
+    line: 'PermitRootLogin yes'
   notify: restart sshd
   tags:
     - basic
@@ -44,10 +45,98 @@
     - ssh_root_login
 
 - name: disable PasswordAuthentication for password logins
-  lineinfile: dest=/etc/ssh/sshd_config
-              regexp="^PasswordAuthentication "
-              insertafter="^#PasswordAuthentication "
-              line="PasswordAuthentication no"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication '
+    insertafter: '^#PasswordAuthentication '
+    line: 'PasswordAuthentication no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable PermitEmptyPasswords
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitEmptyPasswords '
+    insertafter: '^#PermitEmptyPasswords '
+    line: 'PermitEmptyPasswords no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable GSSAPIAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^GSSAPIAuthentication '
+    insertafter: '^#GSSAPIAuthentication '
+    line: 'GSSAPIAuthentication no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable KerberosAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KerberosAuthentication '
+    insertafter: '^#KerberosAuthentication '
+    line: 'KerberosAuthentication no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable UsePAM
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^UsePAM '
+    insertafter: '^#UsePAM '
+    line: 'UsePAM no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+# default `KexAlgorithms` can be found in `man sshd_config`
+# get modern suggestion from https://observatory.mozilla.org/
+# more ref: https://security.stackexchange.com/q/39756
+- name: update KexAlgorithms
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KexAlgorithms '
+    insertafter: '^#KexAlgorithms '
+    line: 'KexAlgorithms curve25519-sha256,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: update Ciphers
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Ciphers '
+    insertafter: '^#Ciphers '
+    line: 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: update MACs
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^MACs '
+    insertafter: '^#MACs '
+    line: 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com'
   notify: restart sshd
   tags:
     - basic
