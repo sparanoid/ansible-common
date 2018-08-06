@@ -92,12 +92,12 @@
     - ssh
     - ssh_port
 
-- name: disable UsePAM
+- name: enable UsePAM
   lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^UsePAM '
     insertafter: '^#UsePAM '
-    line: 'UsePAM no'
+    line: 'UsePAM yes'
   notify: restart sshd
   tags:
     - basic
