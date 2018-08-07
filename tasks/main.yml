@@ -258,6 +258,7 @@
   yum:
     name: "{{ item }}"
     state: present
+    enablerepo: "epel"
   with_items: "{{ common_packages }}"
   notify: update updatedb
   tags:
