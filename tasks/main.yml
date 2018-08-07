@@ -212,35 +212,22 @@
   debug: msg={{ ansible_architecture }}
   tags: debug
 
-- name: install essential repos (7, noarch)
+- name: install essential repos
   yum:
     name: "{{ item }}"
     state: present
     validate_certs: no
   with_items: "{{ repos }}"
-  when: ansible_distribution_version >= '7'
   tags:
     - basic
     - repo
 
-- name: install essential repos (6, x86_64)
-  yum:
-    name: "{{ item }}"
-    state: present
-    validate_certs: no
-  with_items: "{{ repos_6_x86_64 }}"
-  when: ansible_distribution_version < '7' and ansible_architecture == 'x86_64'
-  tags:
-    - basic
-    - repo
-
-- name: install essential repos (6, i386)
-  yum:
-    name: "{{ item }}"
-    state: present
-    validate_certs: no
-  with_items: "{{ repos_6_i386 }}"
-  when: ansible_distribution_version < '7' and ansible_architecture != 'x86_64'
+- name: make sure epel are enabled (edge case)
+  ini_file:
+    dest: /etc/yum.repos.d/epel.repo
+    section: epel
+    option: enabled
+    value: 1
   tags:
     - basic
     - repo
@@ -258,7 +245,6 @@
   yum:
     name: "{{ item }}"
     state: present
-    enablerepo: "epel"
   with_items: "{{ common_packages }}"
   notify: update updatedb
   tags:
