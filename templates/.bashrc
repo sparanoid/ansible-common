@@ -100,6 +100,7 @@ alias listen='lsof -i -P | grep LISTEN'
 alias mysqltuner='perl /usr/share/MySQLTuner-perl/mysqltuner.pl'
 alias apcc='vi /etc/php.d/apc.ini'
 alias vhostc='/etc/httpd/conf.d/vhost.conf'
+alias dup='bash /srv/scripts/duplicity/duplicity-backup.sh -c /srv/scripts/duplicity/server.conf'
 alias conn="netstat -ntu | awk '{print \$5}' | cut -d: -f1 | sort | uniq -c | sort -n"
 
 alias gl="git log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
