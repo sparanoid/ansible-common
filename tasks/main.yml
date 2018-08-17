@@ -11,7 +11,7 @@
   authorized_key:
     user: root
     key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-
+  when: add_authorized_key
   tags:
     - basic
     - ssh
