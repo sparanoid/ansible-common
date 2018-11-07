@@ -264,6 +264,14 @@
   tags:
     - sysctl
 
+- name: disable email for cron
+  cron:
+    name: MAILTO
+    env: yes
+    value: ""
+  tags:
+    - cron
+
 #
 # setup selinux
 #
