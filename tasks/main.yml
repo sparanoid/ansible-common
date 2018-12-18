@@ -7,6 +7,14 @@
       - ssh_port - {{ ssh_port }}
   tags: debug
 
+- name: set timezone to UTC
+  timezone:
+    hwclock: UTC
+    name: UTC
+  tags:
+    - basic
+    - timezone
+
 - name: make sure authorized_key exists
   authorized_key:
     user: root
