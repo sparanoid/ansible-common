@@ -296,11 +296,10 @@
 
 - name: install dependencies for selinux ansible module
   yum:
-    name: "{{ item }}"
+    name:
+      - libselinux-python
+      - libsemanage-python
     state: latest
-  with_items:
-    - libselinux-python
-    - libsemanage-python
   tags:
     - selinux
 
