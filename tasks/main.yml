@@ -224,6 +224,17 @@
     - bash
     - tmux
 
+- name: update .vimrc for current user
+  template: src=.vimrc
+            dest={{ ansible_env['HOME'] }}/.vimrc
+            owner={{ ansible_user_id }}
+            group={{ ansible_user_id }}
+            mode=0644
+  tags:
+    - basic
+    - bash
+    - vim
+
 - name: get distribution version
   debug: msg={{ ansible_distribution_version }}
   tags: debug
