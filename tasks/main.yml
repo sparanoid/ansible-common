@@ -174,31 +174,6 @@
     - ssh
     - ssh_port
 
-- name: update .zprofile for root and skeleton
-  template: src=.zprofile
-            dest={{ item }}/.zprofile
-            owner=root
-            group=root
-            mode=0644
-  with_items:
-    - /root
-    - /etc/skel
-  tags:
-    - basic
-    - zsh
-    - zprofile
-
-- name: update .zprofile for current user
-  template: src=.zprofile
-            dest={{ ansible_env['HOME'] }}/.zprofile
-            owner={{ ansible_user_id }}
-            group={{ ansible_user_id }}
-            mode=0644
-  tags:
-    - basic
-    - zsh
-    - zprofile
-
 - name: update .bash_profile for root and skeleton
   template: src=.bash_profile
             dest={{ item }}/.bash_profile

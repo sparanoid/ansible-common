@@ -1,7 +1,3 @@
-# Init bash-completion
-[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
-[[ $PS1 && -f "/usr/share/bash-completion/bash_completion" ]] && . "/usr/share/bash-completion/bash_completion"
-
 # Increase open files
 # http://superuser.com/q/433746/49848
 ulimit -n 4096
@@ -14,6 +10,43 @@ ulimit -n 4096
 # export HTTPS_PROXY=http://localhost:6666
 # export all_proxy=socks://localhost:6667
 # export ALL_PROXY=socks://localhost:6667
+
+# Init bash-completion
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+[[ $PS1 && -f "/usr/share/bash-completion/bash_completion" ]] && . "/usr/share/bash-completion/bash_completion"
+
+# Load shell configs
+CURRENT_SHELL="$(basename "/$SHELL")"
+custom_shell_rc() {
+
+  # .bashrc is not auto loaded on macOS
+  if [ "$CURRENT_SHELL" = "bash" ] && [[ "$OSTYPE" == "darwin"* ]]; then
+    if [ -f "$HOME/.bashrc" ]; then
+      source "$HOME/.bashrc"
+    fi
+  fi
+}
+custom_shell_rc
+
+# Load git-prompt
+# https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
+custom_git_branch() {
+
+  # for macOS
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    local git_prompt_path="/Applications/Xcode.app/Contents/Developer/usr/share/git-core/git-prompt.sh"
+
+  # All others
+  else
+    local git_prompt_path="/usr/share/git-core/contrib/completion/git-prompt.sh"
+  fi
+
+  # Load if exists
+  if [ -f "$git_prompt_path" ]; then
+    source "$git_prompt_path"
+  fi
+}
+custom_git_branch
 
 # https://stackoverflow.com/a/51490280/412385
 dvol() {
@@ -30,21 +63,21 @@ dvol() {
 # Usage: lctl unload ss-aliyun-hk-almace
 # Usage: lctlr ss-aliyun-hk-almace
 # Usage: lctll
-lctl () {
+lctl() {
   launchctl $1 ~/Library/LaunchAgents/$2.plist
 }
 
-lctlr () {
+lctlr() {
   launchctl unload ~/Library/LaunchAgents/$1.plist && launchctl load ~/Library/LaunchAgents/$1.plist
 }
 
-lctll () {
+lctll() {
   ls -la ~/Library/LaunchAgents/
 }
 
 # Test SSL with OpenSSL
 # Usage: ssltest sparanoid.com
-ssltest () {
+ssltest() {
   openssl s_client -state -nbio -servername $1 -connect $1:443
 }
 
@@ -53,7 +86,7 @@ ssltest () {
 #
 # Usage: sshconfig-sync hrotti
 # Usage: sshconfig-sync root@45.33.22.16
-sshconfig-sync () {
+sshconfig-sync() {
   scp ~/.ssh/config $1:~/.ssh/config
 }
 
@@ -65,7 +98,7 @@ sshconfig-sync () {
 #
 # Usage: ssh-sync hrotti
 # Usage: ssh-sync root@45.33.22.16
-ssh-sync () {
+ssh-sync() {
   scp ~/.ssh/id_rsa.pub $1:~/.ssh/authorized_keys
 }
 
@@ -74,33 +107,33 @@ ssh-sync () {
 #
 # Usage: profile-sync hrotti
 # Usage: profile-sync root@45.33.22.16
-profile-sync () {
+profile-sync() {
   scp ~/.bash_profile $1:~/.bash_profile
   scp ~/.zprofile $1:~/.zprofile
 }
 
 # Make dir and cd
-mcd () {
+mcd() {
   mkdir -p $1
   cd $1
 }
 
 # Block IP using iptables
-ipblock () {
+ipblock() {
   iptables -A INPUT -s $1 -j DROP
 }
 
 # Unblock IP using iptables
-ipunblock () {
+ipunblock() {
   iptables -D INPUT -s $1 -j DROP
 }
 
 # Make dir and cd
-ms () {
+ms() {
   bash ~/Documents/Mac/Scripts/$1.sh
 }
 
-msl () {
+msl() {
   ls -la ~/Documents/Mac/Scripts/ $1
 }
 
@@ -156,6 +189,7 @@ alias pping='prettyping'
 alias bwd='pwd | sed -e "s:/:🥖:g"'
 alias cwd='pwd | sed -e "s:/: ▸ :g"'
 alias dkc='docker-compose'
+alias cpwd="echo pwd && pwd | tr -d '\n' | pbcopy && echo 'pwd copied to clipboard'"
 
 # https://npm.taobao.org/
 alias cnpm="npm --registry=https://registry.npm.taobao.org \
