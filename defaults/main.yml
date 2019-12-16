@@ -4,8 +4,7 @@ ssh_port: 22
 add_authorized_key: no
 repos:
   - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
-  - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/7/x86_64/ius-release-1.0-15.ius.el7.noarch.rpm"
-  - "https://dl.iuscommunity.org/pub/ius/stable/Redhat/7/x86_64/yum-plugin-replace-0.2.7-1.ius.el7.noarch.rpm"
+  - "https://repo.ius.io/ius-release-el7.rpm"
 common_packages:
   - vim
   - mlocate

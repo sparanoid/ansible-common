@@ -174,31 +174,6 @@
     - ssh
     - ssh_port
 
-- name: update .bash_profile for root and skeleton
-  template: src=.bash_profile
-            dest={{ item }}/.bash_profile
-            owner=root
-            group=root
-            mode=0644
-  with_items:
-    - /root
-    - /etc/skel
-  tags:
-    - basic
-    - bash
-    - bash_profile
-
-- name: update .bash_profile for current user
-  template: src=.bash_profile
-            dest={{ ansible_env['HOME'] }}/.bash_profile
-            owner={{ ansible_user_id }}
-            group={{ ansible_user_id }}
-            mode=0644
-  tags:
-    - basic
-    - bash
-    - bash_profile
-
 - name: update .bashrc for root and skeleton
   template: src=.bashrc
             dest={{ item }}/.bashrc
