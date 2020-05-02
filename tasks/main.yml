@@ -243,11 +243,23 @@
   debug: msg={{ ansible_architecture }}
   tags: debug
 
-- name: install essential repos
-  yum:
+
+- name: install essential repos (8)
+  dnf:
     name: "{{ repos }}"
     state: present
     validate_certs: no
+  when: ansible_distribution_version >= '8'
+  tags:
+    - basic
+    - repo
+
+- name: install essential repos (7)
+  yum:
+    name: "{{ repos_7 }}"
+    state: present
+    validate_certs: no
+  when: ansible_distribution_version = '7'
   tags:
     - basic
     - repo
@@ -262,20 +274,42 @@
     - basic
     - repo
 
+- name: do dnf update
+  yum:
+    name: '*'
+    state: latest
+    exclude: "{{ dnf_update_exclude_packages }}"
+  when: ansible_distribution_version >= '8'
+  tags:
+    - basic
+    - update
+
 - name: do yum update
   yum:
     name: '*'
     state: latest
     exclude: "{{ yum_update_exclude_packages }}"
+  when: ansible_distribution_version = '7'
   tags:
     - basic
     - update
 
 - name: install essential packages
-  yum:
+  dnf:
     name: "{{ common_packages }}"
     state: present
+    when: ansible_distribution_version >= '8'
+    notify: update updatedb
+  tags:
+    - basic
+    - repo
+
+- name: install essential packages
+  yum:
+    name: "{{ common_packages_7 }}"
+    state: present
   notify: update updatedb
+  when: ansible_distribution_version = '7'
   tags:
     - basic
     - repo
@@ -306,11 +340,21 @@
 #
 
 - name: install dependencies for selinux ansible module
+  dnf:
+    name:
+      - python3-libselinux
+    state: latest
+  when: ansible_distribution_version >= '8'
+  tags:
+    - selinux
+
+- name: install dependencies for selinux ansible module
   yum:
     name:
       - libselinux-python
       - libsemanage-python
     state: latest
+  when: ansible_distribution_version = '7'
   tags:
     - selinux
 
@@ -328,13 +372,14 @@
     - selinux
 
 #
-# setup mail
+# setup mail (7)
 #
 
 - name: check if postfix is installed
   yum:
     list: postfix
   register: postfix_yum_list
+  when: ansible_distribution_version = '7'
 
 - name: disable postfix for security
   service:
@@ -342,7 +387,7 @@
     state: stopped
     enabled: no
   ignore_errors: yes
-  when: postfix_yum_list.results|selectattr("yumstate", "match", "installed")|list|length != 0
+  when: ansible_distribution_version = '7' and postfix_yum_list.results|selectattr("yumstate", "match", "installed")|list|length != 0
   tags:
     - mail
 
@@ -355,6 +400,6 @@
   with_items:
     - { param: 'inet_interfaces', value: 'localhost' }
     - { param: 'process_control_timeout', value: '5' }
-  when: postfix_yum_list.results|selectattr("yumstate", "match", "installed")|list|length != 0
+  when: ansible_distribution_version = '7' and postfix_yum_list.results|selectattr("yumstate", "match", "installed")|list|length != 0
   tags:
     - mail

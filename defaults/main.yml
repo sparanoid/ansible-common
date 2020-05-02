@@ -3,9 +3,17 @@ deploy_user: deploy
 ssh_port: 22
 add_authorized_key: no
 repos:
+  - epel-release
+repos_7:
   - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
   - "https://repo.ius.io/ius-release-el7.rpm"
 common_packages:
+  - vim-enhanced
+  - mlocate
+  - htop
+  - tmux
+  - rsync
+common_packages_7:
   - vim
   - mlocate
   - which
@@ -13,6 +21,7 @@ common_packages:
   - htop
   - tmux
   - rsync
+dnf_update_exclude_packages: kernel*
 yum_update_exclude_packages: kernel*
 sysctl_params:
   - { "key": "fs.file-max", "value": "51200" }
