@@ -10,12 +10,14 @@ repos_7:
 debian_common_packages:
   - htop
   - rsync
+  - socat
 common_packages:
   - vim-enhanced
   - mlocate
   - htop
   - tmux
   - rsync
+  - socat
 common_packages_7:
   - vim
   - mlocate
@@ -24,6 +26,7 @@ common_packages_7:
   - htop
   - tmux
   - rsync
+  - socat
 dnf_update_exclude_packages: kernel*
 yum_update_exclude_packages: kernel*
 sysctl_params:
