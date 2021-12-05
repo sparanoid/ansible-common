@@ -1,0 +1,405 @@
+#
+# basic setup
+#
+- name: role brief
+  debug:
+    msg:
+      - ssh_port - {{ ssh_port }}
+  tags: debug
+
+- name: set timezone to UTC
+  timezone:
+    hwclock: UTC
+    name: UTC
+  tags:
+    - basic
+    - timezone
+
+- name: make sure authorized_key exists
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  when: add_authorized_key
+  tags:
+    - basic
+    - ssh
+    - debug
+
+- name: check authorized_keys permission
+  file: path=~/.ssh/authorized_keys
+        mode=0600
+  tags:
+    - basic
+    - ssh
+    - debug
+
+- name: update server hostname
+  hostname: name={{ inventory_hostname }}
+  tags:
+    - basic
+    - ssh
+    - hostname
+
+- name: enable PermitRootLogin
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin '
+    insertafter: '^#PermitRootLogin '
+    line: 'PermitRootLogin yes'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_root_login
+
+- name: disable PasswordAuthentication for password logins
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication '
+    insertafter: '^#PasswordAuthentication '
+    line: 'PasswordAuthentication no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable PermitEmptyPasswords
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitEmptyPasswords '
+    insertafter: '^#PermitEmptyPasswords '
+    line: 'PermitEmptyPasswords no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable GSSAPIAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^GSSAPIAuthentication '
+    insertafter: '^#GSSAPIAuthentication '
+    line: 'GSSAPIAuthentication no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable KerberosAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KerberosAuthentication '
+    insertafter: '^#KerberosAuthentication '
+    line: 'KerberosAuthentication no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: disable ChallengeResponseAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^ChallengeResponseAuthentication '
+    insertafter: '^#ChallengeResponseAuthentication '
+    line: 'ChallengeResponseAuthentication no'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: enable UsePAM
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^UsePAM '
+    insertafter: '^#UsePAM '
+    line: 'UsePAM yes'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+# default `KexAlgorithms` can be found in `man sshd_config`
+# get modern suggestion from https://observatory.mozilla.org/
+# more ref: https://security.stackexchange.com/q/39756
+- name: update KexAlgorithms
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KexAlgorithms '
+    insertafter: '^#KexAlgorithms '
+    line: 'KexAlgorithms curve25519-sha256,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: update Ciphers
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Ciphers '
+    insertafter: '^#Ciphers '
+    line: 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: update MACs
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^MACs '
+    insertafter: '^#MACs '
+    line: 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com'
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: change SSH port to {{ ssh_port }}
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^Port "
+              insertafter="^#Port "
+              line="Port {{ ssh_port }}"
+  notify: restart sshd
+  tags:
+    - basic
+    - ssh
+    - ssh_port
+
+- name: update .bashrc for root and skeleton
+  template: src=.bashrc
+            dest={{ item }}/.bashrc
+            owner=root
+            group=root
+            mode=0644
+  with_items:
+    - /root
+    - /etc/skel
+  tags:
+    - basic
+    - bash
+    - bashrc
+
+- name: update .bashrc for current user
+  template: src=.bashrc
+            dest={{ ansible_env['HOME'] }}/.bashrc
+            owner={{ ansible_user_id }}
+            group={{ ansible_user_id }}
+            mode=0644
+  tags:
+    - basic
+    - bash
+    - bashrc
+
+- name: update .tmux.conf for root and skeleton
+  template: src=.tmux.conf
+            dest={{ item }}/.tmux.conf
+            owner=root
+            group=root
+            mode=0644
+  with_items:
+    - /root
+    - /etc/skel
+  tags:
+    - basic
+    - bash
+    - tmux
+
+- name: update .tmux.conf for current user
+  template: src=.tmux.conf
+            dest={{ ansible_env['HOME'] }}/.tmux.conf
+            owner={{ ansible_user_id }}
+            group={{ ansible_user_id }}
+            mode=0644
+  tags:
+    - basic
+    - bash
+    - tmux
+
+- name: update .vimrc for current user
+  template: src=.vimrc
+            dest={{ ansible_env['HOME'] }}/.vimrc
+            owner={{ ansible_user_id }}
+            group={{ ansible_user_id }}
+            mode=0644
+  tags:
+    - basic
+    - bash
+    - vim
+
+- name: get distribution version
+  debug: msg={{ ansible_distribution_version }}
+  tags: debug
+
+- name: get architecture
+  debug: msg={{ ansible_architecture }}
+  tags: debug
+
+
+- name: install essential repos (8)
+  dnf:
+    name: "{{ repos }}"
+    state: present
+    validate_certs: no
+  when: ansible_distribution_version >= '8'
+  tags:
+    - basic
+    - repo
+
+- name: install essential repos (7)
+  yum:
+    name: "{{ repos_7 }}"
+    state: present
+    validate_certs: no
+  when: ansible_distribution_version == '7'
+  tags:
+    - basic
+    - repo
+
+- name: make sure epel are enabled (edge case)
+  ini_file:
+    dest: /etc/yum.repos.d/epel.repo
+    section: epel
+    option: enabled
+    value: "1"
+  tags:
+    - basic
+    - repo
+
+- name: do dnf update
+  yum:
+    name: '*'
+    state: latest
+    exclude: "{{ dnf_update_exclude_packages }}"
+  when: ansible_distribution_version >= '8'
+  tags:
+    - basic
+    - update
+
+- name: do yum update
+  yum:
+    name: '*'
+    state: latest
+    exclude: "{{ yum_update_exclude_packages }}"
+  when: ansible_distribution_version == '7'
+  tags:
+    - basic
+    - update
+
+- name: install essential packages
+  dnf:
+    name: "{{ common_packages }}"
+    state: present
+  notify: update updatedb
+  when: ansible_distribution_version >= '8'
+  tags:
+    - basic
+    - repo
+
+- name: install essential packages
+  yum:
+    name: "{{ common_packages_7 }}"
+    state: present
+  notify: update updatedb
+  when: ansible_distribution_version == '7'
+  tags:
+    - basic
+    - repo
+
+- name: tweak sysctl
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items: "{{ sysctl_params }}"
+  # Allow erros for OpenVZ serviers
+  ignore_errors: yes
+  tags:
+    - sysctl
+
+- name: disable email for cron
+  cron:
+    name: MAILTO
+    env: yes
+    value: ""
+  tags:
+    - cron
+
+#
+# setup selinux
+#
+
+- name: install dependencies for selinux ansible module
+  dnf:
+    name:
+      - python3-libselinux
+    state: latest
+  when: ansible_distribution_version >= '8'
+  tags:
+    - selinux
+
+- name: install dependencies for selinux ansible module
+  yum:
+    name:
+      - libselinux-python
+      - libsemanage-python
+    state: latest
+  when: ansible_distribution_version == '7'
+  tags:
+    - selinux
+
+- name: disable selinux temporarily (in permissive mode)
+  command: setenforce 0
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - selinux
+
+- name: disable selinux permanently (at next reboot)
+  selinux:
+    state: disabled
+  tags:
+    - selinux
+
+#
+# setup mail (7)
+#
+
+- name: check if postfix is installed
+  yum:
+    list: postfix
+  register: postfix_yum_list
+  when: ansible_distribution_version == '7'
+
+- name: disable postfix for security
+  service:
+    name: postfix
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+  when: ansible_distribution_version == '7' and postfix_yum_list.results|selectattr("yumstate", "match", "installed")|list|length != 0
+  tags:
+    - mail
+
+- name: set postfix parameters
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^{{ item.param }}"
+    insertafter: "^#{{ item.param }}"
+    line: "{{ item.param }} = {{ item.value }}"
+  with_items:
+    - { param: 'inet_interfaces', value: 'localhost' }
+    - { param: 'process_control_timeout', value: '5' }
+  when: ansible_distribution_version == '7' and postfix_yum_list.results|selectattr("yumstate", "match", "installed")|list|length != 0
+  tags:
+    - mail
