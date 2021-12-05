@@ -7,6 +7,9 @@ repos:
 repos_7:
   - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
   - "https://repo.ius.io/ius-release-el7.rpm"
+debian_common_packages:
+  - htop
+  - rsync
 common_packages:
   - vim-enhanced
   - mlocate
@@ -24,16 +27,15 @@ common_packages_7:
 dnf_update_exclude_packages: kernel*
 yum_update_exclude_packages: kernel*
 sysctl_params:
-  - { "key": "fs.file-max", "value": "51200" }
+  - { "key": "fs.file-max", "value": "1000000" }
   - { "key": "net.core.rmem_max", "value": "67108864" }
   - { "key": "net.core.wmem_max", "value": "67108864" }
   - { "key": "net.core.rmem_default", "value": "65536" }
   - { "key": "net.core.wmem_default", "value": "65536" }
-  - { "key": "net.core.netdev_max_backlog", "value": "4096" }
-  - { "key": "net.core.somaxconn", "value": "4096" }
+  - { "key": "net.core.netdev_max_backlog", "value": "10000" }
+  - { "key": "net.core.somaxconn", "value": "60000" }
   - { "key": "net.ipv4.tcp_syncookies", "value": "1" }
   - { "key": "net.ipv4.tcp_tw_reuse", "value": "1" }
-  - { "key": "net.ipv4.tcp_tw_recycle", "value": "0" }
   - { "key": "net.ipv4.tcp_fin_timeout", "value": "30" }
   - { "key": "net.ipv4.tcp_keepalive_time", "value": "1200" }
   - { "key": "net.ipv4.ip_local_port_range", "value": "10000 65000" }
