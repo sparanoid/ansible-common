@@ -173,6 +173,7 @@
     - basic
     - ssh
     - ssh_port
+    - ssh_port_update
 
 - name: update .vimrc for current user
   template: src=.vimrc
