@@ -47,3 +47,5 @@ sysctl_params:
   - { "key": "net.ipv4.tcp_rmem", "value": "4096 87380 67108864" }
   - { "key": "net.ipv4.tcp_wmem", "value": "4096 65536 67108864" }
   - { "key": "net.ipv4.tcp_mtu_probing", "value": "1" }
+  - { "key": "net.ipv4.ip_forward", "value": "1" }
+  - { "key": "net.ipv6.conf.all.forwarding", "value": "1" }
