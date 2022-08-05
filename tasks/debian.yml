@@ -210,6 +210,21 @@
     - basic
     - repo
 
+- name: enable modules on boot
+  blockinfile:
+    dest: /etc/modules-load.d/modules.conf
+    block: |
+      tcp_bbr
+  tags:
+    - sysctl
+
+- name: add tcp_bbr module
+  modprobe:
+    name: tcp_bbr
+    state: present
+  tags:
+    - sysctl
+
 - name: tweak sysctl
   sysctl:
     name: "{{ item.key }}"
