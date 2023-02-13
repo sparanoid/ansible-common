@@ -11,6 +11,9 @@ debian_common_packages:
   - htop
   - rsync
   - socat
+  - nload
+  - curl
+  - fish
 common_packages:
   - vim-enhanced
   - mlocate
