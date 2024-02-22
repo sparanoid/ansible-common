@@ -18,7 +18,18 @@
 - name: make sure authorized_key exists
   authorized_key:
     user: root
+    key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
+  when: add_authorized_key
+  tags:
+    - basic
+    - ssh
+    - debug
+
+- name: make sure old RSA key removed
+  authorized_key:
+    user: root
     key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    state: "absent"
   when: add_authorized_key
   tags:
     - basic

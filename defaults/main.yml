@@ -1,7 +1,7 @@
 ---
 deploy_user: deploy
 ssh_port: 2233
-add_authorized_key: no
+add_authorized_key: yes
 repos:
   - epel-release
 repos_7:
